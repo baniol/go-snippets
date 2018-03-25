@@ -67,8 +67,28 @@ __4) ServeMux__
 
 __5) middleware__
 
+`curl localhost:8080/helloworld -d '{"name": "john"}'`
+
 https://www.safaribooksonline.com/library/view/building-microservices-with/9781786468666/30f61396-c1f9-47ab-b5d1-1ed431ce69db.xhtml
+
+Split request handling (validation & returning a response)
+
+```go
+type validationHandler struct {
+	next http.Handler
+}
+```
+Both `validationHandler` and `helloWorldHandler` implement the `ServeHTTP` method satisfying the `Handler` interface.
+The `validationHandler` must have a reference to the next in the chain: 
+```go
+handler := newValidationHandler(newHelloWorldHandler())
+http.Handle("/helloworld", handler)
+```
 
 __6) context__
 
 https://www.safaribooksonline.com/library/view/building-microservices-with/9781786468666/fbc92048-e0df-4a3a-a986-4735e7f6003a.xhtml
+
+
+
+> TODO, next: https://www.safaribooksonline.com/library/view/security-with-go/9781788627917/f0fe0d1e-470a-4cbf-a1f0-2c0c160ec4ce.xhtml
