@@ -1,0 +1,21 @@
+
+syntax = "proto2";
+package main;
+
+message BookProto {
+  required string title = 1;
+  required string author = 2;
+  optional int64 pages = 3;
+  repeated string chapters = 4;
+}
+
+// protoc --go_out=. book.proto
+
+//go:generate msgp -tests=false
+// type BookDef struct {
+// 	Title    string   `msg:"title"`
+// 	Author   string   `msg:"author"`
+// 	Pages    int      `msg:"num_pages"`
+// 	Chapters []string `msg:"chapters"`
+// }
+// go generate
