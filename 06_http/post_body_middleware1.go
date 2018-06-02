@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
+	"time"
 )
 
-// curl -H "Content-Type: application/json" -X POST -d '{"name": "Katowice", "area": 3000000}' localhost:8080/city
+// curl -i -H "Content-Type: application/json" -X POST -d '{"name": "Katowice", "area": 3000000}' localhost:8080/city
 
 type city struct {
 	Name string `json:"name"`
@@ -23,6 +25,17 @@ func contentTypeValidator(handler http.Handler) http.Handler {
 			return
 		}
 		handler.ServeHTTP(w, r)
+	})
+}
+
+// Middleware to add server timestamp for response cookie
+func setServerTimeCookie(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		handler.ServeHTTP(w, r)
+		// Setting cookie to each and every response
+		cookie := http.Cookie{Name: "Server-Time(UTC)", Value: strconv.FormatInt(time.Now().Unix(), 10)}
+		http.SetCookie(w, &cookie)
+		log.Println("Currently in the set server time middleware")
 	})
 }
 
@@ -46,6 +59,6 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	mainLogic := http.HandlerFunc(mainHandler)
-	http.Handle("/city", contentTypeValidator(mainLogic))
+	http.Handle("/city", contentTypeValidator(setServerTimeCookie(mainLogic)))
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
